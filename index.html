@@ -175,12 +175,12 @@ function locPage(p){const it=D.items[p];const rows=it.loc||[];const tot=rows.red
 function openPO(p,push=true){if(!D.items[p])return;if(push)stack.push(location.hash||'#customers');lastView=view;poPage(p);window.scrollTo(0,0);if(push)history.replaceState(null,'','#po='+encodeURIComponent(p));}
 function poPage(p){const it=D.items[p];const L=it.pl||[];const fd=s=>s?s.slice(5,7)+'/'+s.slice(8,10)+'/'+s.slice(0,4):'—';
  main.innerHTML=`<button class="back" id="back">← Back</button><h1><span class="mono">${p}</span> · open POs &amp; in transit</h1><div class="sub">${esc(it.d)} · quantities in ${it.u} · ${esc(D.asof)}</div>
- <div class="narr howto"><b>How to read this page.</b> One row for each purchase order line still open for this product. <b>In Transit (Fishbowl)</b> at the top is stock already shipped to us and on its way — one line, not split by PO. <b>Canada</b> rows are open POs of our Canada company.</div>
+ <div class="narr howto"><b>How to read this page.</b> One row for each purchase order line still open for this product. <b>In Transit (Fishbowl)</b>, below the open PO total, is stock already shipped to us and on its way — one line, not split by PO. <b>Canada</b> rows are open POs of our Canada company.</div>
  <div class="tiles">${tile('In transit',fmtN(it.it),it.u+' · on its way to us')}${tile('Open PO',fmtN(it.po),it.u+' · ordered, not yet shipped')}${tile('Total',fmtN(it.it+it.po),it.u+' · in transit + open PO')}</div>
  <div class="wrap"><table><thead><tr><th>PO #</th><th>Order date</th><th>Due date</th><th class="r">Qty</th></tr></thead><tbody>
- ${it.it?`<tr class="po-it"><td colspan="3">In Transit (Fishbowl)</td><td class="r">${fmtN(it.it)}</td></tr>`:''}
  ${L.map(x=>`<tr><td class="mono">${esc(x[0])}${x[4]==='CA'?' <span class="pill ok">Canada</span>':''}</td><td>${fd(x[1])}</td><td>${fd(x[2])}</td><td class="r">${fmtN(x[3])}</td></tr>`).join('')}
  ${L.length&&it.it?`<tr class="totrow po-sub"><td colspan="3">Open PO total</td><td class="r">${fmtN(it.po)}</td></tr>`:''}
+ ${it.it?`<tr class="po-it"><td colspan="3">In Transit (Fishbowl)</td><td class="r">${fmtN(it.it)}</td></tr>`:''}
  <tr class="totrow po-tot"><td colspan="3">${it.it?'Total (in transit + open PO)':'Open PO total'}</td><td class="r">${fmtN(it.it+it.po)}</td></tr></tbody></table></div>
  <p class="small"><span class="loc mono" data-item-link="${p}">Open the ${p} item card →</span></p>`;
  document.getElementById('back').onclick=goBack;}
