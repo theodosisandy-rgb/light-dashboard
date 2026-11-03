@@ -30,7 +30,7 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-
 .tile .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .tile .v{font-size:24px;font-weight:600;margin-top:4px;letter-spacing:-.01em}
 .loc{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;text-decoration-color:var(--muted)} .loc:hover{color:var(--accent,#1f4e9c)}
-.tile .v.crit{color:var(--crit)} .tile .v.warn{color:#b07a00} .tile .d{font-size:11px;color:var(--muted);margin-top:2px}
+.tile .v.crit{color:var(--crit)} .tile .v.warn{color:#b07a00} .tile .d{font-size:11px;color:var(--muted);margin-top:2px} .tile.t-oh{background:color-mix(in srgb,#2e9d52 16%,var(--surface));border-color:color-mix(in srgb,#2e9d52 45%,var(--surface))} .tile.t-otw{background:color-mix(in srgb,#eda100 20%,var(--surface));border-color:color-mix(in srgb,#eda100 50%,var(--surface))} .tile.t-tot{background:color-mix(in srgb,#2a78d6 16%,var(--surface));border-color:color-mix(in srgb,#2a78d6 45%,var(--surface))} .tiles.c6{grid-template-columns:repeat(6,minmax(0,1fr))} .tiles.c7{grid-template-columns:repeat(7,minmax(0,1fr))} .tiles+.tiles{margin-top:10px} @media (max-width:1100px){.tiles.c6,.tiles.c7{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
 .narr{background:var(--surface);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:14px;max-width:72ch;color:var(--ink-2)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px} .two>div{min-width:0}
 @media (max-width:900px){.app{grid-template-columns:1fr}nav{position:static;height:auto;padding-bottom:10px}nav .foot{position:static;margin-top:8px}main{padding:16px 14px 40px}.two{grid-template-columns:1fr}}
@@ -100,6 +100,7 @@ function bars(a,title,unit){const v=a.slice(0,12).reverse();const lab=M.slice(0,
   s+=`<text x="${(cx+bw/2).toFixed(1)}" y="${H_-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${lab[i]}</text>`;});
  s+=`<line x1="${pl}" x2="${W_-6}" y1="${y0.toFixed(1)}" y2="${y0.toFixed(1)}" stroke="var(--muted)"/></svg></div>`;return s;}
 const main=document.getElementById('main');
+function tileX(k,l,v,d){return tile(l,v,d).replace('<div class="tile">','<div class="tile '+k+'">');}
 function tile(l,v,d,cls){return `<div class="tile"><div class="l">${l}</div><div class="v ${cls||''}">${v}</div>${d?`<div class="d">${d}</div>`:''}</div>`;}
 // ---- Customers ----
 let custSort={k:'items',d:-1},custAE='(All)',custAM='(All)',custQ='';
@@ -149,7 +150,7 @@ function itemTable(){const list=ITEMS_ALL.filter(x=>(itemCat==='All'||cat(x.p)==
 function itemCard(p){const it=D.items[p];if(!it)return;const rs=D.rows.filter(r=>r.p===p&&r.any).sort((a,b)=>b.qttm-a.qttm||b.last-a.last);const q=new Array(N).fill(0);for(const r of rs)for(let i=0;i<N;i++)q[i]+=r.q[i];
  const qttm=sum(q,0,12),l3=sum(q,0,3)/3,tr=qttm>0?l3/(qttm/12)-1:null;
  main.innerHTML=`<button class="back" id="back">← Back</button><h1><span class="mono">${p}</span> · ${esc(it.d)}</h1><div class="sub">${cat(p)} · sold in ${it.u} · ${rs.length} customer${rs.length===1?'':'s'} · ${esc(D.asof)}</div>
- <div class="tiles">${tile('TTM qty sold',fmtN(qttm),it.u)}${tile('Oct-26 qty',fmtN(q[0]),it.u)}${tile('3mo Trend vs TTM Avg',pct(tr),'% change: Aug–Oct avg month vs last-12-month avg month',trendCls(tr))}${tile('On hand',`<span class="loc" data-loc="${p}">${fmtN(it.oh)}</span>`,it.u+' in our warehouses now · click for by-location')}${tile('In transit',fmtN(it.it),it.u+' shipped to us, not received')}${tile('Open PO',it.po?`<span class="loc" data-po="${p}">${fmtN(it.po)}</span>`:fmtN(it.po),it.u+' ordered, not yet shipped · click for POs')}</div>
+ <div class="tiles c7">${tile('TTM qty sold',fmtN(qttm),it.u)}${tile('Oct-26 qty',fmtN(q[0]),it.u)}${tile('3mo Trend vs TTM Avg',pct(tr),'% change: Aug–Oct avg month vs last-12-month avg month',trendCls(tr))}${tileX('t-oh','On hand',`<span class="loc" data-loc="${p}">${fmtN(it.oh)}</span>`,it.u+' in our warehouses now · click for by-location')}${tileX('t-otw','In transit',fmtN(it.it),it.u+' shipped to us, not received')}${tileX('t-otw','Open PO',it.po?`<span class="loc" data-po="${p}">${fmtN(it.po)}</span>`:fmtN(it.po),it.u+' ordered, not yet shipped · click for POs')}${tileX('t-tot','Total Inv. (OH + OTW)',fmtN(it.oh+it.it+it.po),it.u+' · on hand + in transit + open PO')}</div>
  <h2>Monthly quantity — last 12 months, all customers</h2>${bars(q,p+' — '+it.d,it.u)}
  <h2>Monthly quantity by customer — 18 months</h2>${rs.length?'':'<div class="narr howto">No sales of this item in the last 18 months. It is listed because it carries an inventory balance.</div>'}
  <div class="narr howto"><b>How to read this table.</b> One row per customer that buys this product. Quantity invoiced each month, newest month on the left (Oct-26) back to May-25 on the right, in the product's unit. <b>TTM</b> = the 12-month total (Nov-25 through Oct-26). <b>${D.mtd_label}</b> = this month so far (${MTDR}), a partial month that is not in TTM or the shading. A cell shaded red is a month that came in under half of that customer's average month for this product.</div>
